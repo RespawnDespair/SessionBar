@@ -16,5 +16,6 @@ fi
 
 # Hooks point at the installed binary, so install them from there.
 "$INSTALLED/Contents/MacOS/SessionBar" --install-hooks
+"$INSTALLED/Contents/MacOS/SessionBar" --launch-at-login on || true
 open "$INSTALLED"
 echo "Installed: $INSTALLED"

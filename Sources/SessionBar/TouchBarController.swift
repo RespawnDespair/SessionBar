@@ -35,7 +35,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate, NSScrubberDataSour
 
         if newAttention && openOnAttention { isExpanded = true }
         if sessions.isEmpty {
-            if let touchBar, isPresented { SystemModalTouchBar.dismiss(touchBar) }
+            if let touchBar, isPresented {
+                SystemModalTouchBar.dismiss(touchBar)
+                ControlStripItem.setPresence(trayIdentifier, visible: true)
+            }
             isPresented = false
         } else if isExpanded && (!isPresented || newAttention) {
             present()
@@ -70,7 +73,10 @@ final class TouchBarController: NSObject, NSTouchBarDelegate, NSScrubberDataSour
         let button = NSButton(image: NSImage(size: NSSize(width: 9, height: 22)), target: self, action: #selector(toggle))
         button.isBordered = false
         button.imagePosition = .imageOnly
+        button.imageScaling = .scaleNone
         button.setAccessibilityLabel("Claude sessies")
+        button.widthAnchor.constraint(equalToConstant: 36).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 24).isActive = true
         item.view = button
         item.visibilityPriority = .high
         trayItem = item
@@ -93,19 +99,20 @@ final class TouchBarController: NSObject, NSTouchBarDelegate, NSScrubberDataSour
     }
 
     @objc private func toggle() {
-        if isPresented, let touchBar {
-            SystemModalTouchBar.minimize(touchBar)
-            isPresented = false
-            isExpanded = false
-        } else {
-            isExpanded = true
-            if !sessions.isEmpty { present() }
-        }
+        if isPresented { collapse() } else { expand() }
+    }
+
+    /// Shows the full bar again; also used by the menu bar item.
+    func expand() {
+        isExpanded = true
+        if !sessions.isEmpty { present() }
     }
 
     @objc private func collapse() {
         guard let touchBar else { return }
         SystemModalTouchBar.minimize(touchBar)
+        // Minimising hides our Control Strip item too; put it back so the bar can be reopened.
+        ControlStripItem.setPresence(trayIdentifier, visible: true)
         isPresented = false
         isExpanded = false
     }

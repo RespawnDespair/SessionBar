@@ -114,6 +114,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         menu.addItem(.separator())
 
+        let show = NSMenuItem(title: "Touch Bar tonen", action: #selector(showTouchBar), keyEquivalent: "")
+        show.target = self
+        menu.addItem(show)
+
         let attention = NSMenuItem(title: "Touch Bar openen bij aandacht", action: #selector(toggleOpenOnAttention), keyEquivalent: "")
         attention.target = self
         attention.state = openOnAttention ? .on : .off
@@ -146,6 +150,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let id = sender.representedObject as? String,
               let session = store.sessions.first(where: { $0.record.id == id }) else { return }
         open(session)
+    }
+
+    @objc private func showTouchBar() {
+        touchBar.expand()
     }
 
     @objc private func toggleOpenOnAttention() {
